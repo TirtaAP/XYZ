@@ -1,0 +1,63 @@
+TextFormField(
+                      controller: _nama,
+                      decoration: const InputDecoration(labelText: 'Nama'),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Mohon Masukan Nama';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    TextFormField(
+                      controller: _telepon,
+                      decoration: const InputDecoration(labelText: 'Telepon'),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Mohon Masukan Telepon';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    TextFormField(
+                      controller: _nama,
+                      decoration: const InputDecoration(labelText: 'Password'),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Mohon Masukan Password';
+                        }
+                        if (value.trim().length < 8) {
+                          return 'Password  harus 8 karakter';
+                        }
+                        // Return null if the entered password is valid
+                        pass = value;
+                        return null;
+                      },
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    TextFormField(
+                        controller: _nama,
+                        decoration: const InputDecoration(
+                            labelText: 'Konfirmasi Password'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Konfirmasi Password Tidak Sama';
+                          }
+
+                          if (value != pass) {
+                            return 'Konfirmasi Password Tidak Sama';
+                          }
+                          // Return null if the entered password is valid
+
+                          return null;
+                        }),
+                    const SizedBox(
+                      height: 25,
+                    ),

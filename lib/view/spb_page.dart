@@ -14,22 +14,34 @@ class spbPage extends StatefulWidget {
 
 class _spbPageState extends State<spbPage> {
   final UserController usercontroller = Get.put(UserController());
+  final Stream<QuerySnapshot> _usersStream =
+      FirebaseFirestore.instance.collection('users').snapshots();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: StreamBuilder(
-          stream: UserController.GetAllpelanggan(),
-          builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
-            if (streamSnapshot.hasData) {
-              return ListView.builder(
-                itemCount: streamSnapshot.data!.docs.length,
+        body: StreamBuilder<QuerySnapshot>(
+          stream: _usersStream,
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return const Text('Something went wrong');
+            }
+
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Text("Loading");
+            }
+
+            return ListView.builder(
+                itemCount: snapshot.data!.docs.length,
                 itemBuilder: (context, index) {
                   final DocumentSnapshot documentSnapshot =
-                      streamSnapshot.data!.docs[index];
+                      snapshot.data!.docs[index];
                   return Card(
                     margin: const EdgeInsets.all(10),
                     child: ListTile(
                       title: Text(documentSnapshot['nama']),
+                      subtitle: Text(documentSnapshot['telepon']),
                       trailing: SizedBox(
                           width: 100,
                           child: PopupMenuButton<Menu>(
@@ -47,17 +59,12 @@ class _spbPageState extends State<spbPage> {
                                   ])),
                     ),
                   );
-                },
-              );
-            }
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+                });
           },
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: ((() {
-            Get.to(() => spbForm());
+            Get.to(() => SpbForm());
           })),
           child: Icon(Icons.add),
         ));

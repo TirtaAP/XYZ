@@ -1,41 +1,25 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:xyz/controller/sariBuahcontroller.dart';
 import 'package:xyz/entity/komposisi.dart';
-import 'package:xyz/helper/format_changer.dart';
-import 'package:xyz/view/komposisi_form.dart';
-import 'package:xyz/entity/komposisi.dart';
+import 'package:get/get.dart';
 
-class BarangForm extends StatefulWidget {
-  BarangForm({Key? key}) : super(key: key);
+class SertifikatForm extends StatefulWidget {
+  SertifikatForm({Key? key}) : super(key: key);
 
   @override
-  State<BarangForm> createState() => _BarangFormState();
+  State<SertifikatForm> createState() => _SertifikatFormState();
 }
 
-class _BarangFormState extends State<BarangForm> {
-  final TextEditingController _tanggalproduksi = TextEditingController();
-  final TextEditingController _tanggalkadaluarsa = TextEditingController();
-  final TextEditingController _isiBersih = TextEditingController();
-  final TextEditingController _harga = TextEditingController();
-  final TextEditingController _jumlah = TextEditingController();
-  final sariBuahController saribuahController = Get.put(sariBuahController());
-  var tanggalKadaluarsa;
-  var tanggalProduksi;
+class _SertifikatFormState extends State<SertifikatForm> {
+  final TextEditingController lembaga = TextEditingController();
+  final TextEditingController nomorSertifikat = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  late String docid;
-  final Stream<QuerySnapshot> _Stream =
-      FirebaseFirestore.instance.collection('saribuah').snapshots();
-
-  Map<String, Komposisi> daftarKomposisi = {};
-
+  final sariBuahController saribuahController = Get.put(sariBuahController());
   void _trySubmitForm() {
     final bool? isValid = _formKey.currentState?.validate();
     if (isValid == true) {
-      saribuahController.addSariBuah(context, _isiBersih.text, tanggalProduksi,
-          tanggalKadaluarsa, _harga.text, _jumlah.text);
+      saribuahController.addKomposisi(
+          Get.arguments[0], lembaga.text, nomorSertifikat.text);
     }
   }
 
@@ -44,7 +28,7 @@ class _BarangFormState extends State<BarangForm> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: const Text('Tambah Sari Buah'),
+        title: const Text('Tambah Sertifikat'),
         backgroundColor: Colors.red,
       ),
       body: Container(
@@ -57,9 +41,9 @@ class _BarangFormState extends State<BarangForm> {
                 child: Column(
                   children: [
                     TextFormField(
-                      controller: _isiBersih,
+                      controller: lembaga,
                       decoration:
-                          const InputDecoration(labelText: 'Isi Bersih'),
+                          const InputDecoration(labelText: 'Nama Lembaga'),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'Mohon Masukan Data';
@@ -69,6 +53,17 @@ class _BarangFormState extends State<BarangForm> {
                     ),
                     const SizedBox(
                       height: 25,
+                    ),
+                    TextFormField(
+                      controller: nomorSertifikat,
+                      decoration:
+                          const InputDecoration(labelText: 'Kode Sertifikat'),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Mohon Masukan Data';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(
                       height: 25,

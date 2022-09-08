@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:xyz/helper/constant.dart';
 import 'package:xyz/controller/authcontroller.dart';
-import 'package:xyz/view/login_page.dart';
-import 'package:xyz/view/logut.dart';
 import 'package:xyz/view/pelanggan_page.dart';
 import 'package:xyz/view/penjualan_page.dart';
 import 'package:xyz/view/pesanan_page.dart';
@@ -11,16 +9,15 @@ import 'package:xyz/view/spb_page.dart';
 import 'package:xyz/view/stok_page.dart';
 import 'package:xyz/widgets/headrawer.dart';
 import 'package:xyz/widgets/sidenav.dart';
-import 'package:get/get.dart';
 
-class adminHome extends StatefulWidget {
-  adminHome({Key? key}) : super(key: key);
+class spbHome extends StatefulWidget {
+  spbHome({Key? key}) : super(key: key);
 
   @override
-  State<adminHome> createState() => _adminHomeState();
+  State<spbHome> createState() => _spbHomeState();
 }
 
-class _adminHomeState extends State<adminHome> {
+class _spbHomeState extends State<spbHome> {
   var currentPage = DrawerSections.penjualan;
 
   @override
@@ -39,7 +36,7 @@ class _adminHomeState extends State<adminHome> {
     } else if (currentPage == DrawerSections.stok) {
       container = stockPage();
     } else if (currentPage == DrawerSections.privacy_policy) {
-      container = LoginScreen();
+      container = AuthController().logout();
     } else if (currentPage == DrawerSections.send_feedback) {
       container = () {};
     }

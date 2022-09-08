@@ -1,0 +1,40 @@
+class User {
+  String username;
+  String nama;
+  String telepon;
+  String password;
+  String level;
+
+class SaribuahApel {
+  String isiBersih;
+  DateTime tglProduksi;
+  DateTime tglKadaluarsa;
+  String barcode;
+  Map<String, dynamic> komposisi;
+  Map<String, dynamic> noSertifikat;
+
+class boxSariBuahApel {
+  int jumlah;
+  int harga;
+  String barcode;
+
+  class bahan(
+  String nama;
+  String ukuran;
+  int stok;
+
+  class Pesanan {
+  String pelanggan;
+  DateTime tanggal;
+  Map<String, dynamic> listPesanan;
+  int harga;
+  String status;
+  String oleh;
+
+class Penjualan {
+  DateTime tglAwal;
+  DateTime tglAkhir
+  int totalPesanan;
+  int jumlahTerjual;
+  int totalBiaya;
+  int totalHarga;

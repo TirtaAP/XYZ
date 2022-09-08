@@ -1,54 +1,49 @@
+import 'dart:ffi';
+
 import 'package:get/get.dart';
+import 'package:xyz/entity/boxSariBuah.dart';
+import 'package:xyz/entity/pelanggan.dart';
 import 'package:xyz/helper/constant.dart';
 import 'package:xyz/helper/dialog_helper.dart';
 import 'package:xyz/entity/pesanan.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:xyz/view/admin_page.dart';
 
 class PesananController extends GetxController {
-  registerPesanan(String pelanggan, String tanggal, String barang,
-      String jumlah, String harga, String status, String oleh) async {
-    try {
-      if (tanggal.isNotEmpty &&
-          barang.isNotEmpty &&
-          jumlah.isNotEmpty &&
-          harga.isNotEmpty) {
-        Pesanan pesanan = Pesanan(
-            pelanggan: pelanggan,
-            tanggal: tanggal,
-            barang: barang,
-            jumlah: jumlah,
-            harga: harga,
-            status: status,
-            oleh: oleh);
-        await fireStore
-            .collection('pesanan')
-            .doc()
-            .set(pesanan.toJson())
-            .whenComplete(() => print("Notes item added to the database"));
-      } else {
-        Get.snackbar('Error Input', 'Mohon Lengkapi Data Anda',
-            snackPosition: SnackPosition.TOP);
-      }
-    } catch (e) {
-      DialogHelper.hideLoading();
-      Get.snackbar('Gagal Memasukan Data', e.toString(),
-          snackPosition: SnackPosition.TOP);
-    }
+  List<Pesanan> pesananList = [];
+
+  addPesanan(String pelanggan, String saribuah, DateTime tanggal, int jumlah,
+      int harga, String status, String oleh) async {
+    DocumentReference docrefSBA = fireStore.doc(saribuah);
+    DocumentReference docrefP = fireStore.doc(pelanggan);
+    Pesanan pesanan = Pesanan(
+        pelanggan: docrefP,
+        tanggal: tanggal,
+        boxSariBuahApel: docrefSBA,
+        harga: harga,
+        jumlah: jumlah,
+        status: status,
+        oleh: oleh);
+    pesanan.addPesanan(pesanan);
+    Get.offAll(adminHome());
   }
 
-  Stream<QuerySnapshot> GetAllpesanan() {
-    CollectionReference notesItemCollection = fireStore.collection('pesanan');
-
-    return notesItemCollection.snapshots();
+  HapusPesanan(String docid) {
+    Pesanan pesanan = Pesanan();
+    pesanan.hapusPesanan(docid);
+    Get.back();
   }
 
-  HapusPesanan(String id) async {
-    try {
-      await fireStore.collection('pesanan').doc(id).delete();
-    } catch (e) {
-      DialogHelper.hideLoading();
-      Get.snackbar('Gagal Menghapus Data', e.toString(),
-          snackPosition: SnackPosition.TOP);
-    }
+  totalPesanan() {
+    Pesanan pesanan = Pesanan();
+    var a = pesanan.totalpenjualan();
+
+    return a;
+  }
+
+  docReftoDocSnap(String path) async {
+    DocumentSnapshot a = await fireStore.doc(path).get();
+
+    return a;
   }
 }

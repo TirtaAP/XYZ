@@ -1,44 +1,71 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:xyz/entity/boxSariBuah.dart';
 import 'package:xyz/helper/constant.dart';
 import 'package:xyz/helper/dialog_helper.dart';
 import 'package:xyz/entity/saribuahApel.dart';
+import 'package:xyz/entity/komposisi.dart';
+import 'package:xyz/entity/sertifikat.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class sariBuahController extends GetxController {
-  addSariBuah(String kodeproduksi, String nama, int harga, int jumlah) async {
-    try {
-      if (kodeproduksi.isNotEmpty && nama.isNotEmpty) {
-        Saribuah saribuah =
-            Saribuah(kodeproduksi: kodeproduksi, hargaMin: harga);
-        await fireStore
-            .collection('barang')
-            .doc()
-            .set(saribuah.toJson())
-            .whenComplete(() => print("Data berhasil disimpan"));
-      } else {
-        Get.snackbar('Error Input', 'Mohon Lengkapi Data Anda',
-            snackPosition: SnackPosition.TOP);
-      }
-    } catch (e) {
-      DialogHelper.hideLoading();
-      Get.snackbar('Gagal Memasukan Data', e.toString(),
-          snackPosition: SnackPosition.TOP);
-    }
+  SaribuahApel saribuahApel = new SaribuahApel();
+  addSariBuah(
+    BuildContext context,
+    String isiBersih,
+    DateTime tglProduksi,
+    DateTime tglKadaluarsa,
+    String harga,
+    String jumlah,
+  ) async {
+    var har = int.parse(harga);
+    var jum = int.parse(jumlah);
+    SaribuahApel saribuah = SaribuahApel(
+      isiBersih: isiBersih,
+      tglProduksi: tglProduksi,
+      tglKadaluarsa: tglKadaluarsa,
+      komposisi: Kompos,
+      sertifikat: Serti,
+    );
+
+    Navigator.pop(context);
   }
 
-  Stream<QuerySnapshot> GetAllBarang() {
-    CollectionReference notesItemCollection = fireStore.collection('barang');
+  hapusSaribuah(String docid) {
+    saribuahApel.hapusSariBuah(docid);
+    Get.back();
+  }
+
+  addKomposisi(String docid, String nama, String kandungan) {
+    Komposisi komposisi = new Komposisi(nama: nama, kandungan: kandungan);
+    SaribuahApel saribuahApel = new SaribuahApel();
+    saribuahApel.addKomposisi(docid, komposisi);
+  }
+
+  Stream<QuerySnapshot> GetAllSaribuah() {
+    CollectionReference notesItemCollection = fireStore.collection('saribuah');
 
     return notesItemCollection.snapshots();
   }
 
-  hapusSariBuah(String id) async {
-    try {
-      await fireStore.collection('barang').doc(id).delete();
-    } catch (e) {
-      DialogHelper.hideLoading();
-      Get.snackbar('Gagal Menghapus Data', e.toString(),
-          snackPosition: SnackPosition.TOP);
-    }
+  addStoksaribuah(String docid, DateTime tanggalKadaluarsa,
+      DateTime tanggalProduksi, int isJumlah, int harga, int stok) async {
+    var ref = await fireStore.collection('saribuah').doc(docid).get();
+    SaribuahApel saribuahApel = new SaribuahApel();
+
+    saribuahApel.setIsiBersih = ref['isiBersih'];
+    saribuahApel.setKomposisi = ref['komposisi'];
+    saribuahApel.setSertifikat = ref['sertifikat'];
+    saribuahApel.setTglKadaluarsa = tanggalKadaluarsa;
+    saribuahApel.setTglProduksi = tanggalProduksi;
+    BoxSariBuahApel boxSariBuahApel = BoxSariBuahApel(
+        jumlah: stok, harga: harga, isi: isJumlah, saribuahApel: saribuahApel);
+    boxSariBuahApel.addSaribuahbox(boxSariBuahApel);
+  }
+
+  hapusStokSaribuah(String docid) {
+    BoxSariBuahApel boxSariBuahApel = BoxSariBuahApel();
+
+    boxSariBuahApel.hapusBox(docid);
   }
 }

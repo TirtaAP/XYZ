@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:xyz/controller/pesanancontroller.dart';
 import 'package:xyz/view/pesanan_form.dart';
 import 'package:xyz/helper/constant.dart';
@@ -14,27 +15,103 @@ class PesananPage extends StatefulWidget {
 
 class _PesananPageState extends State<PesananPage> {
   final PesananController pesanancontroller = Get.put(PesananController());
+  final Stream<QuerySnapshot> _usersStream =
+      FirebaseFirestore.instance.collection('pesanan').snapshots();
+  final CollectionReference _invoices =
+      FirebaseFirestore.instance.collection('pesanan');
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: StreamBuilder(
-          stream: pesanancontroller.GetAllpesanan(),
-          builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
-            if (streamSnapshot.hasData) {
-              return ListView.builder(
-                itemCount: streamSnapshot.data!.docs.length,
+        body: StreamBuilder<QuerySnapshot>(
+          stream: _usersStream,
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return const Text('Something went wrong');
+            }
+
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Text("Loading");
+            }
+
+            return ListView.builder(
+                itemCount: snapshot.data!.docs.length,
                 itemBuilder: (context, index) {
                   final DocumentSnapshot documentSnapshot =
-                      streamSnapshot.data!.docs[index];
+                      snapshot.data!.docs[index];
+                  var path = documentSnapshot['pelanggan'].toString();
+                  String pat = path.splitMapJoin(RegExp('\\(.*?\\)'),
+                      onMatch: (m) => '${m[0]}', onNonMatch: (n) => '');
+
+                  String patt = pat.substring(1, pat.length - 1);
                   return Card(
                     margin: const EdgeInsets.all(10),
                     child: ListTile(
-                      title: Text(documentSnapshot['tanggal']),
+                      title: FutureBuilder(
+                        future: fireStore.doc(patt).get(),
+                        builder:
+                            (BuildContext context, AsyncSnapshot snapshot) {
+                          return Text(snapshot.data['nama']);
+                        },
+                      ),
+                      subtitle: Column(
+                        children: [
+                          Text(documentSnapshot['status']),
+                          Text(DateFormat.yMd().format(
+                              (documentSnapshot['tanggal'] as Timestamp)
+                                  .toDate()))
+                        ],
+                      ),
                       trailing: SizedBox(
                           width: 100,
                           child: PopupMenuButton<Menu>(
-                              onSelected: (Menu menu) {},
+                              onSelected: (Menu menu) {
+                                if (menu == Menu.edit) {
+                                  Get.to(() => PesananForm(), arguments: [
+                                    true,
+                                  ]);
+                                } else {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) =>
+                                          AlertDialog(
+                                            titlePadding:
+                                                const EdgeInsets.all(0),
+                                            title: Container(
+                                              padding: const EdgeInsets.all(5),
+                                              color: Colors.red,
+                                              child: const Center(
+                                                  child: Text(
+                                                "HAPUS INVOICE?",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              )),
+                                            ),
+                                            actions: [
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  Get.back();
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                    primary: Colors.grey),
+                                                child: const Text("BATAL"),
+                                              ),
+                                              ElevatedButton(
+                                                onPressed: () async {
+                                                  pesanancontroller
+                                                      .HapusPesanan(
+                                                          documentSnapshot.id);
+                                                  Get.back();
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                    primary: Colors.red),
+                                                child: const Text("HAPUS"),
+                                              ),
+                                            ],
+                                          ));
+                                }
+                              },
                               itemBuilder: (BuildContext context) =>
                                   <PopupMenuEntry<Menu>>[
                                     const PopupMenuItem(
@@ -48,17 +125,12 @@ class _PesananPageState extends State<PesananPage> {
                                   ])),
                     ),
                   );
-                },
-              );
-            }
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+                });
           },
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: ((() {
-            Get.to(() => PesananForm());
+            Get.to(() => PesananForm(), arguments: [false]);
           })),
           child: Icon(Icons.add),
         ));

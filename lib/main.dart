@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:xyz/view/komposisi_form.dart';
+import 'package:xyz/view/spb_form.dart';
 import 'view/login_page.dart';
 import 'view/admin_page.dart';
+import 'view/saribuah_form.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() async {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -36,7 +40,8 @@ class _MyAppState extends State<MyApp> {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: adminHome(),
+      home: LoginScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

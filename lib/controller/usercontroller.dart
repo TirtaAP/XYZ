@@ -4,39 +4,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:xyz/helper/constant.dart';
 import 'package:xyz/helper/dialog_helper.dart';
-import 'package:xyz/entity/user.dart' as model;
+import 'package:xyz/entity/user.dart';
+import 'package:xyz/view/admin_page.dart';
 
 class UserController extends GetxController {
-  AddSPB(String username, String nama, String telepon, String password,
-      String confirmPass) async {
-    try {
-      if (username.isNotEmpty &&
-          nama.isNotEmpty &&
-          telepon.isNotEmpty &&
-          password.isNotEmpty) {
-        model.User user = model.User(
-            username: username,
-            nama: nama,
-            telepon: telepon,
-            password: password,
-            level: "SPB");
-        await fireStore
-            .collection('users')
-            .doc()
-            .set(user.toJson())
-            .whenComplete(() => print("user item added to the database"));
-      } else {
-        Get.snackbar('Error Input', 'Mohon Lengkapi Data Anda',
-            snackPosition: SnackPosition.TOP);
-      }
-    } catch (e) {
-      DialogHelper.hideLoading();
-      Get.snackbar('Gagal Memasukan Data', e.toString(),
-          snackPosition: SnackPosition.TOP);
-    }
+  AddSPB(
+    BuildContext context,
+    String email,
+    String nama,
+    String telepon,
+    String password,
+  ) async {
+    User user = User(
+        email: email,
+        nama: nama,
+        telepon: telepon,
+        password: password,
+        role: "SPB");
+    user.addSPB(user);
+    Navigator.pop(context);
   }
 
-  static Stream<QuerySnapshot> GetAllpelanggan() {
+  static Stream<QuerySnapshot> GetAllUser() {
     CollectionReference notesItemCollection = fireStore.collection('users');
 
     return notesItemCollection.snapshots();
